@@ -40,10 +40,9 @@
   padding: 20px;
 }
 
-.boto input{
+.boto p{
   width: 300px;
   height: 25px;
-  border-radius: 5px;
   padding: 2px;
   margin-right: 20px;
 }
@@ -54,4 +53,8 @@
   border-radius: 5px;
   padding: 3px;
   width: 80px;
+}
+
+.boto-p{
+  background-color: white;
 }
