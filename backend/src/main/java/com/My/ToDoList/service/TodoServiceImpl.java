@@ -21,7 +21,6 @@ public class TodoServiceImpl implements TodoService{
 
     @Override
     public Todo createTodo(Todo todo) {
-        System.out.println("Received Todo: " + todo);
         return todoRepository.save(todo);
     }
 
