@@ -36,17 +36,16 @@ const Home = () => {
     }
   }
 
-  const deleteTodo = async (id)=>{
-    const todo = {title}
-   
-    try{
-      const {data} = await axios.delete(`${api}/${id}`)
-      setTodos(todos.filter(todo=>todo.id!==id));
-      console.log("Deleting todo id:",id)
-    }catch(error){
-      console.log("catch error:" ,error)
+  const deleteTodo = async (id) => {
+
+    try {
+      await axios.delete(`${api}/${id}`); // No need to use response data
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id)); // Ensure latest state
+    } catch (error) {
+      console.error("Delete error:", error);
     }
-  }
+  };
+  
 
   return (
     <div className='backo'>
