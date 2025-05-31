@@ -2,19 +2,25 @@ package com.My.ToDoList.controller;
 
 import com.My.ToDoList.model.ApiResponse;
 import com.My.ToDoList.model.Todo;
+import com.My.ToDoList.repository.TodoRepository;
 import com.My.ToDoList.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin(origins = "http://localhost:5174/")
 @RequestMapping("/api")
 public class TodoController {
 
     @Autowired
     private TodoService todoService;
+
+    @Autowired
+    private TodoRepository todoRepository;
 
     @GetMapping("/")
     public ApiResponse homeController(){
@@ -46,4 +52,20 @@ public class TodoController {
         response.setStatus(true);
         return response;
     }
+
+    @PutMapping("/todos/{id}")
+    public ResponseEntity<Todo> updateTodo(@PathVariable Long id, @RequestBody Todo todo) {
+        Optional<Todo> optionalTodo = todoRepository.findById(id);
+        if (!optionalTodo.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Todo existingTodo = optionalTodo.get();
+        existingTodo.setTitle(todo.getTitle());
+        Todo updatedTodo = todoRepository.save(existingTodo);
+        return ResponseEntity.ok(updatedTodo);
+    }
+
+
+
 }
