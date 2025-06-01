@@ -3,7 +3,9 @@ import axios from 'axios';
 import EmojiPicker from 'emoji-picker-react';
 import { FlowerRain } from './FlowerRain';
 
-const api = "http://localhost:8080/api/todos";
+const api = `${process.env.REACT_APP_API_URL}/api/todos`;
+
+
 
 const Home = () => {
   const [title, setTitle] = useState('');
@@ -25,7 +27,9 @@ const Home = () => {
     }
   };
 
-  const createTodo = async () => {
+  const createTodo = async (e) => {
+    if (e) e.preventDefault();
+
     if (!title.trim()) return;
     try {
       const { data } = await axios.post(api, { title });
@@ -73,7 +77,6 @@ const Home = () => {
     }
   };
 
-  // Greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -81,30 +84,28 @@ const Home = () => {
     else return "Good evening";
   };
 
-  // Format current date in readable form
   const getFormattedDate = () => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date().toLocaleDateString(undefined, options);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-purple-100 to-pink-100 flex items-center justify-center px-4 relative overflow-hidden z-10">
-      <FlowerRain/>
-      {/* Background Blobs */}
-      <div className="absolute w-72 h-72 bg-pink-300 opacity-30 rounded-full top-10 -left-20 blur-3xl animate-pulse"></div>
-      <div className="absolute w-72 h-72 bg-purple-300 opacity-30 rounded-full bottom-10 -right-20 blur-3xl animate-pulse"></div>
+    <div className="relative z-10 flex items-center justify-center min-h-screen px-4 overflow-hidden bg-gradient-to-br from-slate-800 via-lime-950 to-amber-950">
+      <FlowerRain />
+      <div className="absolute bg-pink-300 rounded-full w-72 h-72 opacity-30 top-10 -left-20 blur-3xl animate-pulse"></div>
+      <div className="absolute bg-purple-300 rounded-full w-72 h-72 opacity-30 bottom-10 -right-20 blur-3xl animate-pulse"></div>
 
-      <div className="w-full max-w-2xl bg-white/60 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl p-10 relative z-10">
-        {/* Greeting and Date */}
-        <div className="text-center mb-4 text-gray-700 text-lg font-semibold">
+      <div className="relative z-10 w-full max-w-2xl p-10 border shadow-2xl bg-white/60 backdrop-blur-xl border-white/20 rounded-3xl">
+        <div className="mb-4 text-lg font-semibold text-center text-gray-700">
           {getGreeting()}! Today is {getFormattedDate()}.
         </div>
 
-        <h1 className="text-4xl font-bold text-center text-purple-700 mb-6 tracking-wide">
+        <h1 className="mb-6 text-4xl font-bold tracking-wide text-center text-purple-700">
           🌈 My Magical Todo List
         </h1>
 
-        <div className="flex gap-3 mb-4">
+        {/* 📝 Input and Buttons */}
+        <form onSubmit={createTodo} className="flex gap-3 mb-4">
           <input
             type="text"
             placeholder="✍️ Write something amazing..."
@@ -112,51 +113,54 @@ const Home = () => {
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
+                e.preventDefault();
                 createTodo();
               }
             }}
-            className="flex-grow px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+            className="flex-grow px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400"
           />
 
           <button
+            type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="px-4 bg-yellow-300 rounded-xl hover:scale-105 transition"
+            className="px-4 transition bg-yellow-300 rounded-xl hover:scale-105"
           >
             😀
           </button>
+
           <button
-            onClick={createTodo}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl hover:scale-105 hover:shadow-lg transition-all"
+            type="submit"
+            className="px-6 py-3 text-white transition-all bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl hover:scale-105 hover:shadow-lg"
           >
             ➕ Add
           </button>
-        </div>
+        </form>
 
         {showEmojiPicker && (
-          <div className="mb-4 z-50">
+          <div className="z-50 mb-4">
             <EmojiPicker onEmojiClick={handleEmojiClick} />
           </div>
         )}
 
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">🗂️ Your Tasks</h2>
+        <h2 className="mb-4 text-2xl font-semibold text-gray-800">🗂️ Your Tasks</h2>
 
-        <div className="space-y-4 max-h-64 overflow-y-auto pr-2 scroll-smooth">
+        <div className="pr-2 space-y-4 overflow-y-auto max-h-64 scroll-smooth">
           {todos.length === 0 && (
-            <p className="text-center text-gray-500 italic">✨ Start by adding something!</p>
+            <p className="italic text-center text-gray-500">✨ Start by adding something!</p>
           )}
 
           {todos.map((item, index) => (
             <div
               key={item.id}
-              className="flex justify-between items-center bg-white border border-purple-200 px-4 py-3 rounded-xl shadow-sm transition hover:shadow-md hover:bg-purple-50"
+              className="flex items-center justify-between px-4 py-3 transition bg-white border border-purple-200 shadow-sm rounded-xl hover:shadow-md hover:bg-purple-50"
             >
               {editingId === item.id ? (
-                <div className="flex-grow flex items-center gap-2">
+                <div className="flex items-center flex-grow gap-2">
                   <input
                     type="text"
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    className="flex-grow border border-gray-300 rounded-lg px-2 py-1"
+                    className="flex-grow px-2 py-1 border border-gray-300 rounded-lg"
                   />
                   <button
                     onClick={() => saveEdit(item.id)}
@@ -173,7 +177,7 @@ const Home = () => {
                 </div>
               ) : (
                 <>
-                  <p className="text-gray-800 font-medium flex-grow">
+                  <p className="flex-grow font-medium text-gray-800">
                     <span className="text-purple-500">{index + 1}.</span> {item.title}
                   </p>
                   <div className="flex gap-2">
